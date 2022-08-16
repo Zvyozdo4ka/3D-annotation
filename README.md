@@ -6,6 +6,7 @@ Description Building docker image for implementing bijection from 2D image onto 
 
 File-architecture:
 
+```
 path_get_upload_model/
 +--images_colmap/
 +--colmap_output/
@@ -23,6 +24,8 @@ path_get_upload_model/
 +--images_segmentation/
 +--log/
 +--vis/
+```
+
 path_get_upload_model/ - the path where we get all data for 3D image annotation from. Into this path generated output_model.ply would be uploaded.
 
 images_colmap/ - images without noise and downscaled. The experiments showed that these images can be used instead of original images for image annotation as they have smaller image size which leads to reducing time consumption of evaluating the final 3D model.

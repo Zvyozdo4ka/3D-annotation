@@ -50,7 +50,7 @@ def colmap_read_intrinsics(path):
     for line in lines:
         camera_id = int(line[0])
         camera_type = line[1]
-        cparam = array(line.split()[2:]).astype('float')
+        cparam = array(line.split()[2:]).astype('float32')
 #         intrinsics = {
 #             'Fx':cparam[2],
 #             'Fy':cparam[3],
@@ -119,21 +119,21 @@ def colmap_read_views(path):
         extrinsics = lines[2*i].split()
         keypoints = lines[2*i+1].split()
         image_id = int(extrinsics[0])
-        q = array(extrinsics[1:5]).astype(float)
-        t = array(extrinsics[5:8]).astype(float)
+        q = array(extrinsics[1:5]).astype(float32)
+        t = array(extrinsics[5:8]).astype(float32)
         camera_id = int(extrinsics[8])
         filename = extrinsics[9]
 
         R = quaterion2rotation(q)
         P = intrinsics['K'].dot(concatenate((R,array([t]).T),axis=1))
-        point2d = array(keypoints).astype(float).reshape((-1,3))
+        point2d = array(keypoints).astype(float32).reshape((-1,3))
 
         views.append({'filename':filename, 'P':P, 'x_y_tpid':point2d,'image id':image_id,'camera id':camera_id})
     return views
 
 
 def colmap_get_tps(views):    
-    x_y_tpid = zeros((0,3),dtype='float')
+    x_y_tpid = zeros((0,3),dtype='float32')
     for idx,view in enumerate(views):
         x_y_tpid = concatenate((x_y_tpid,view['x_y_tpid']),axis=0)
         views[idx]['tp_counts']=view['x_y_tpid'].shape[0]

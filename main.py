@@ -8,8 +8,8 @@ import matplotlib.path as mplPath
 import open3d as o3d
 from read_txt import *
 
-import argparse
-import jsonargparse
+# import argparse
+# import jsonargparse
 
 
 def points_in_polygons(pnts, polygons):
@@ -29,7 +29,7 @@ def points_in_polygons(pnts, polygons):
 def points_in_rectangles(pnts, rectangles, r):
     rectangles = np.array(rectangles)
     rectangles = np.append(rectangles, rectangles[0:2])
-    rectangles = np.resize(rectangles, (np.int(rectangles.shape[0]/2), 2))
+    rectangles = np.resize(rectangles, (int(rectangles.shape[0]/2), 2))
     annotation_Points = np.zeros([5, 2])
     annotation_Points[0] = rectangles[0]
     annotation_Points[1] = [rectangles[0][0], rectangles[1][1]]
@@ -99,32 +99,28 @@ def annotation_highlight(X, Y, data, Pointcloud):
     return isIn_A
 
 
-# if os.environ['path_get_upload_model']:
-# path_get_upload_model = os.environ['path_get_upload_model']
-# -e path_get_upload_model="./77347d5333c34d5ead4e8e28e8f0e142" \
-# path_get_upload_model = "/app/data"
-# else:
-    # path_get_upload_model = './77347d5333c34d5ead4e8e28e8f0e142'
+if os.environ['path_get_upload_model']:
+    path_get_upload_model = os.environ['path_get_upload_model']
+else:
+    path_get_upload_model = './data'
 
-path_get_upload_model = "../77347d5333c34d5ead4e8e28e8f0e142"
-model_name = 'model_211108_194622'
-# if os.environ['model_name']:
-#     model_name = os.environ['model_name']
-# else:
-#     model_name = 'model_211108_194622'
+if os.environ['model_name']:
+    model_name = os.environ['model_name']
+else:
+    model_name = 'model_211108_194622'
 
-# annotation_name = os.path.join(path_get_upload_model, 'annotation.json')
-# with open(os.path.join(annotation_name), 'r') as load_f:
-#     load_dict = json.load(load_f)
-#     print("\n -original----load_dict", load_dict, "\n")
+if os.environ['annotation']:
+    load_dict = os.environ['annotation']
+else:
+    load_dict = '{"0":{"annotation":{"rectangles":[],"polygons":[{"color":[23,253,153],"points":[4253,2021,4258,2429,694,2358,35,2313,80,1900]}],"lines":[]},"file_name":"img_211108_160016849755.JPG"}}'
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--load_dict', type=str, required=False)
-args = parser.parse_args()
-load_dict = json.loads(args.load_dict)
+load_dict = json.loads(load_dict)
+print("\n load_dict", load_dict)
 
 model_path = os.path.join(path_get_upload_model, 'colmap_output', model_name)
 txt_path = os.path.join(model_path, 'txt')
+
+print("\n txt_path", txt_path)
 
 cameras, intrinsics = colmap_read_intrinsics(txt_path)
 views = colmap_read_views(txt_path)
@@ -187,7 +183,7 @@ for image_index in load_dict:
                         Y = annotation_inform['points']
                         Y = np.array(Y)
                         # Y = np.append(Y, Y[[0,3,1,2]])
-                        Y = np.resize(Y, (np.int(Y.shape[0]/2),2))
+                        Y = np.resize(Y, (int(Y.shape[0]/2),2))
                     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
                         Y_m = np.zeros([4,2])
                         Y_m[0] = Y[0]
@@ -222,6 +218,7 @@ for image_index in load_dict:
                         Y = annotation_inform['points']
                         Y = np.array(Y)
                         Y = np.resize(Y, (int(Y.shape[0]/2), 2))
+
                         X = data[:, [0, 1]]
                         isIn_A = annotation_highlight(X, Y, data, Pointcloud)
                         
@@ -237,19 +234,8 @@ for image_index in load_dict:
 
 for annotation_No in Data:
 
-    print("annotation_No", annotation_No)
-    print("len(Data)", len(Data))
-
-    # C = Data[annotation_No]['color']
-
     A = Data[annotation_No]['pointcloud']
-
-    print("len(A)", len(A))
-    print("A", A)
-    
-    # A[:, 3:6] = C
     A[:, 3:6] = Data[annotation_No]['color']
-    
     a = Data[annotation_No]['pointcloud_a']
 
     if annotation_No == '0':
@@ -260,13 +246,17 @@ for annotation_No in Data:
         PCA = np.concatenate([PCA, A], axis=0)
         isInx = isInx * np.logical_not(Data[annotation_No]['isIn']) * np.logical_not(a)
         index_a = np.logical_or(index_a, a)
-        
 
 PCB = Pointcloud[isInx]
 PC = np.concatenate([PCB, PCA], axis=0)
 PC_a = Pointcloud[index_a]
 
+print("index_a", index_a)
+
 pcd = o3d.geometry.PointCloud()
 pcd.points = o3d.utility.Vector3dVector(PC[:, 0:3])
 pcd.colors = o3d.utility.Vector3dVector(PC[:, 3:6]/255)
 o3d.io.write_point_cloud(os.path.join(path_get_upload_model, 'output_model.ply'), pcd)
+
+print("pcd.points", pcd.points)
+print("len(pcd.points)", len(pcd.points))

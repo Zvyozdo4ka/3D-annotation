@@ -53,3 +53,7 @@ docker run -v ./path_get_upload_model: ./path/data \
  -e annotation= "annotation_string" \
  zvyozdo4ka/csms4
 ```
+
+**How to build without Docker**
+
+python main.py --load_dict '{"0":{"annotation":{"rectangles":[],"polygons":[{"color":[23,253,153],"points":[4439,3258,1083,3175,1111,2386,5451,2506]}],"lines":[]},"file_name":"img_211108_160622977760.JPG"},"1":{"annotation":{"rectangles":[{"color":[233,53,68],"points":[2188,2630,5439,3104]}],"polygons":[],"lines":[]},"file_name":"img_211108_160016849755.JPG"}}'

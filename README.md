@@ -14,7 +14,6 @@ root_path/
 		+-- txt/
 			+-- cameras.txt
 			+-- images.txt
-			+-- points3D.txt
 ```
 
 **How to run:**
